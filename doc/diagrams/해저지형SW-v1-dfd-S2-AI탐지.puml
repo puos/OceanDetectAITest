@@ -1,0 +1,102 @@
+@startuml 해저지형SW-v1-dfd-S2-AI탐지
+skinparam shadowing false
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 80
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #FFFFCC
+  BorderColor #A80036
+}
+skinparam usecase {
+  BackgroundColor #FFFFCC
+  BorderColor #A80036
+}
+skinparam ArrowColor #A80036
+hide circle
+hide empty members
+allowmixing
+title [DFD] S2 AI 탐지 — 전처리·추론·후처리 (REQ-5, REQ-7 ~ REQ-18)
+
+class "입력: 로컬 점군\n(도엽 xyz)" as IN <<store>>
+class "Volt 모델\n(암반)" as TM <<store>>
+class "CenterPoint 모델 ×3\n(어초·블록·침선)" as OM <<store>>
+class "출력: 분석 결과\n(점별 암반 라벨 + 이상체 Box)" as OUT <<store>>
+class "화면" as SCR <<external>>
+
+class Tiler {
+  +Split(cloud)
+  +DropSparse(tiles)
+}
+class CacheManager {
+  +TryLoad(key)
+  +Save(key, data)
+}
+class SeafloorNormalizer {
+  +Normalize(tiles)
+}
+class NormalEstimator {
+  +Estimate(tile)
+}
+class ModelInputBuilder {
+  +BuildTerrainInput(tile, normals)
+  +BuildObjectInput(tile)
+}
+class TerrainSegmenter {
+  +Predict(input)
+}
+class ObjectDetector {
+  +Predict(input)
+}
+class ResultMerger {
+  +MergeLabels(tileLabels)
+  +MergeBoxes(tileBoxes)
+}
+class PointCloudViewer {
+  +RenderResult(result)
+}
+
+rectangle "① 공통 전처리" {
+  usecase "(1) 50m 타일\n분할·희소 제외" as U1
+  usecase "(2) 해저면 기준\nz 정규화" as U2
+}
+rectangle "② 모델별 입력" {
+  usecase "(3) 국소 법선\n계산" as U3
+  usecase "(4) 모델 입력\n구성" as U4
+}
+rectangle "③ 추론 (순차)" {
+  usecase "(5) 암반 분류\n추론" as U5
+  usecase "(6) 이상체 탐지\n추론 (모델마다)" as U6
+}
+rectangle "④ 후처리" {
+  usecase "(7) 도엽 결과\n병합" as U7
+  usecase "(8) 클래스별\n색상 표시" as U8
+}
+
+IN ---> U1 : xyz 점군
+U1 ---> U2 : 50점 이상 타일
+U2 ---> U3 : 정규화 타일
+U2 ---> U4 : 정규화 타일
+U3 ---> U4 : nx,ny,nz
+U4 ---> U5 : (N,6)
+U4 ---> U6 : (N,4) x,y,z,0
+TM ---> U5
+OM ---> U6
+U5 ---> U6 : 순차 실행
+U5 ---> U7 : 타일 점 라벨
+U6 ---> U7 : 타일 3D Box
+U7 ---> OUT : 도엽 결과
+OUT ---> U8 : 분석 결과
+U8 ---> SCR : 결과 화면
+
+Tiler --- U1 : Split\nDropSparse
+CacheManager --- U1 : TryLoad
+SeafloorNormalizer --- U2 : Normalize
+CacheManager --- U2 : Save
+NormalEstimator --- U3 : Estimate
+ModelInputBuilder --- U4 : BuildTerrainInput\nBuildObjectInput
+TerrainSegmenter --- U5 : Predict
+ObjectDetector --- U6 : Predict
+ResultMerger --- U7 : MergeLabels\nMergeBoxes
+PointCloudViewer --- U8 : RenderResult
+@enduml

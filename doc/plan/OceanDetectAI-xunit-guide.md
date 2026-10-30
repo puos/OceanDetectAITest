@@ -99,19 +99,19 @@ public class SmokeTests
 .NET 9 이하 SDK에서는 다음 명령으로 `.sln`을 생성합니다.
 
 ```powershell
-dotnet new sln -n PCDAITest -o D:\work\OceanDetectAITest
+dotnet new sln -n OceanDetectAITest -o D:\work\OceanDetectAITest
 ```
 
 .NET 10 SDK에서는 기본 솔루션 형식이 `.slnx`이므로 `.sln`을 사용하려면 다음 명령을 대신 실행합니다.
 
 ```powershell
-dotnet new sln -n PCDAITest -o D:\work\OceanDetectAITest --format sln
+dotnet new sln -n OceanDetectAITest -o D:\work\OceanDetectAITest --format sln
 ```
 
 솔루션이 이미 있다면 생성 명령을 건너뛰고, 두 프로젝트를 추가합니다.
 
 ```powershell
-dotnet sln D:\work\OceanDetectAITest\PCDAITest.sln add --solution-folder PCD `
+dotnet sln D:\work\OceanDetectAITest\OceanDetectAITest.sln add --solution-folder PCD `
   D:\work\OceanDetectAITest\PCD\PCD.OceanDetectAI\PCD.OceanDetectAI.csproj `
   D:\work\OceanDetectAITest\PCD\PCD.OceanDetectAI.Tests\PCD.OceanDetectAI.Tests.csproj
 ```

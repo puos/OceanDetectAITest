@@ -16,7 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PCD.OceanDetectAI\PCD.OceanDetectAI.csproj" />
+    <ProjectReference Include="..\..\..\OceanSW\NeoOceanCore\NeoOceanCore.csproj" />
+    <ProjectReference Include="..\..\..\OceanSW\NeoOceanAICore\NeoOceanAICore.csproj" />
   </ItemGroup>
 
   <ItemGroup>
